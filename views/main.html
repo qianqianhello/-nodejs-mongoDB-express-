@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <style>
+     table,tr,th,td{
+         border: 1px solid grey;
+     }
+    </style>
+</head>
+<body>
+    <button></button>
+    <table>
+        <thead>
+            <tr>
+                <th>用户名</th>
+                <th>密码</th>
+                <th>email</th>
+                <th>phone</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+           
+        </tbody>
+    </table>
+</body>
+</html>
+<script>
+    $(function(){
+        // 页面打开后自动获取数据
+       $.ajax({
+           method:'GET',
+           url:'/users?action=check',
+           data:{
+           },
+           success(d){
+               console.log(d)
+           },
+           error(err){
+               console.log(err)
+           }
+       }).then(function(rs){
+			console.log(rs,"打印信息")
+			$('tbody').empty();
+            // $('#pagation').empty();
+            console.log(rs.item.length);
+			for(var i=0;i<rs.item.length;i++){
+                var item = rs.item[i];
+                console.log(item);
+                
+                var tr=`
+                    <tr id="item-${item.account}">
+                    <td>${item.account}</td>
+                    <td>${item.password}</td>
+                    <td>${item.email}</td>
+                    <td>${item.phone}</td>
+                    <td><button id="delect-${item.account}">删除
+                        <button id="revise-${item.account}">修改
+                    </td></tr>"`
+				$('tbody').append(tr);
+			}
+    });
+
+    // 删除操作
+    $('tbody').on('click','button',function delets(e){
+			// $(this).closest("tr").hide();
+            // console.log(this)
+            // ID已取消
+			// var clickedID = this.id.split('-');
+			// // console.log(clickedID)
+			// let ID = clickedID[1];
+            // console.log(ID);
+            let clickedAccount = this.id.split('-');
+            let account = clickedAccount[1];
+			if(confirm("确定要删除吗")){
+                $.ajax({
+					url:'/users?action=del',
+					method:'POST',
+					data:{
+                        // id:ID
+                        account:account
+					},
+					success(d){
+                        console.log(d)
+                        console.log($("#item-"+account))
+						$("#item-"+account).fadeOut("slow");
+						// console.log($(account));
+					},
+					error(err){
+						console.log(err)
+					}
+				})
+			}else{}
+	});
+})
+</script>
